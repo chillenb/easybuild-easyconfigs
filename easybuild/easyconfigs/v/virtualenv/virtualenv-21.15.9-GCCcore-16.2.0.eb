@@ -1,0 +1,54 @@
+easyblock = 'PythonBundle'
+
+name = 'virtualenv'
+version = '21.15.9'
+
+homepage = 'https://github.com/pypa/virtualenv'
+description = "A tool for creating isolated virtual python environments."
+
+toolchain = {'name': 'GCCcore', 'version': '16.2.0'}
+toolchainopts = {'pic': True}
+
+builddependencies = [
+    ('binutils', '2.47'),
+    ('hatchling', '1.29.0'),
+]
+dependencies = [('Python', '3.14.2')]
+
+exts_list = [
+    ('packaging', '26.3', {
+        'checksums': ['94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79'],
+    }),
+    ('distlib', '0.4.4', {
+        'checksums': ['ca4175b4ac7f71223cc30ed7248c45d2b38c2439d8ee6e498ab67ed63cf3508d'],
+    }),
+    ('filelock', '4.2.12', {
+        # drop the python-sbom hatch build hook (only embeds an SBOM in the wheel; plugin not available)
+        'preinstallopts': "sed -i '/python-sbom/d' pyproject.toml && ",
+        'checksums': ['7e7da24d3ac39268b0f156e56870001de44886318f092f9d851e692f7114d6dd'],
+    }),
+    ('platformdirs', '4.14.7', {
+        # drop the python-sbom hatch build hook (only embeds an SBOM in the wheel; plugin not available)
+        'preinstallopts': "sed -i '/python-sbom/d' pyproject.toml && ",
+        'checksums': ['5472257c1cf97a14658af52997011c7e59e4aebf3a24950b973c11b579e1b074'],
+    }),
+    ('python-discovery', '1.9.6', {
+        # use the no-op build hook from hatch_build.py's fallback branch (python-sbom plugin not available)
+        'preinstallopts': "sed -i 's/^if sys.version_info >= (3, 11):/if False:/' hatch_build.py && ",
+        'checksums': ['383aa67858d73a9585a843a37a4383c6be98e4d86a981a031328e393a6eb2632'],
+    }),
+    (name, version, {
+        # use the no-op build hook from hatch_build.py's fallback branch (python-sbom plugin not available)
+        'preinstallopts': "sed -i 's/^if sys.version_info >= (3, 11):/if False:/' hatch_build.py && ",
+        'checksums': ['adc6799981f513ce852aea17ea592e0d342ce48e87f5d17a3d997966df582a67'],
+    }),
+]
+
+sanity_check_paths = {
+    'files': ['bin/%(namelower)s'],
+    'dirs': ['lib/python%(pyshortver)s/site-packages/%(namelower)s'],
+}
+
+sanity_check_commands = ["virtualenv --help"]
+
+moduleclass = 'tools'
